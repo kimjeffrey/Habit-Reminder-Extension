@@ -10,22 +10,31 @@
 <body>
   <h1>Reminder Options</h1>
   <hr>
-  <label for="">
+  <label>
     <input type="checkbox" class="notification-sound-checkbox">
     Play notification sound at end of timer
   </label>
   <select name="" class="notification-sound">
     <option value="arpeggio-467">Arpeggio</option>
     <option value="coins-497">Coin</option>
+    <option value="eventually-590">Eventually</option>
+    <option value="happy-jump-399">Happy Jump</option>
+    <option value="job-done-501">Job Done</option>
+    <option value="munchausen-433">Munchausen</option>
+    <option value="oh-finally-355">Oh Finally</option>
+    <option value="oringz-w427-371">Oringz</option>
+    <option value="tiny-bell-448">Tiny Bell</option>
+    <option value="wet-431">Wet</option>
+    <option value="youve-been-informed-345">You've been informed</option>
   </select>
   <button class="test-notification-sound">Test</button>
   <br>
-  <label for="">
+  <label>
     <input type="checkbox" class="notification-persist">
     Enable persistent notification until dismissed
   </label>
   <br>
-  <p class="warning">(Saving changes will cause any active timers to reset.)</p>
+  <p class="important">(Saving changes will cause any active timers to reset.)</p>
   <div class="save-changes">
     <p class="save-changes-status"></p>
     <button class="save-changes-btn">Save Changes</button>
@@ -34,17 +43,17 @@
   <h1>Create a new habit</h1>
   <hr>
   <form class="habit-form">
-    <label for="">
+    <label>
       Habit name:
       <input class="habit-input" type="text">
     </label> 
     <br>
-    <label for="">
+    <label>
       Time interval:
       <input class="time-input" type="number"> minutes
     </label>
     <br>
-    <p class="warning">(Creating/deleting/editing habits will cause any active timers to reset.)</p>
+    <p class="important">(Creating/deleting/editing habits will cause any active timers to reset.)</p>
     <div class="submit-habit">
       <p class="submit-status"></p>
       <button type="submit">Submit</button>

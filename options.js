@@ -1,9 +1,11 @@
+// Plays notification sound when 'Test' button pressed
 document.querySelector('.test-notification-sound').addEventListener('click', () => {
   let soundName = document.querySelector('.notification-sound').value;
   let sound = new Audio(`sounds/${soundName}.mp3`);
   sound.play();
 })
 
+// Saves changed options and refreshes background page
 document.querySelector('.save-changes').addEventListener('click', () => {
   let soundCheckbox = document.querySelector('.notification-sound-checkbox').checked;
   let sound = document.querySelector('.notification-sound').value;
@@ -24,6 +26,7 @@ document.querySelector('.save-changes').addEventListener('click', () => {
   });
 })
 
+// Creates a new habit through user input and stores it
 document.querySelector('.habit-form').addEventListener('submit', event => {
   event.preventDefault();
 
@@ -35,7 +38,7 @@ document.querySelector('.habit-form').addEventListener('submit', event => {
     return;
   }
 
-  console.log(habitInput.value, timeInput.value);
+  //console.log(habitInput.value, timeInput.value);
 
   let newHabit = {'habitName': habitInput.value, 'timeValue': timeInput.value, 'loop': false};
 
@@ -62,6 +65,7 @@ document.querySelector('.habit-form').addEventListener('submit', event => {
   timeInput.value = "";
 })
 
+// Updates the 'My Habits' List with newly added/deleted habits
 function restoreOptions() {
   const myHabitList = document.querySelector('.my-habit-list');
   const notificationPersist = document.querySelector('.notification-persist');
@@ -93,25 +97,21 @@ function restoreOptions() {
   })
 }
 
+// Creates the habit and returns it in a li
 function createNewHabit(habitName, timeValue, loopBool){
   let li = document.createElement("li");
   let input = document.createTextNode(habitName);
+
   let time = document.createElement("p");
   let habitClassName = habitName.replace(/\s+/g, '');
-  time.className = habitClassName;
   let timeInput = document.createTextNode(timeValue);
-  let deleteButton = document.createElement("button");
-  deleteButton.className = `${habitClassName}-delete`;
-  deleteButton.innerText = 'Delete';
+  time.className = habitClassName;
+  time.appendChild(timeInput);
+
   let loopCheckbox = document.createElement("input");
   loopCheckbox.type = 'checkbox';
   loopCheckbox.className = `${habitClassName}-loop`
   loopCheckbox.checked = loopBool;
-  time.appendChild(timeInput);
-  li.appendChild(loopCheckbox);
-  li.appendChild(input);
-  li.appendChild(time);
-  li.appendChild(deleteButton);
 
   loopCheckbox.addEventListener('change', function() {
     let checked = loopCheckbox.checked;
@@ -136,11 +136,20 @@ function createNewHabit(habitName, timeValue, loopBool){
     })
   })
 
+  let deleteButton = document.createElement("button");
+  deleteButton.className = `${habitClassName}-delete`;
+  deleteButton.innerText = 'Delete';
+
   deleteButton.addEventListener('click', function() {
     chrome.runtime.sendMessage({cmd: 'DELETE_HABIT', 'habitName': habitName, 'habitClassName': habitClassName});
   });
 
-  console.log(li);
+  li.appendChild(loopCheckbox);
+  li.appendChild(input);
+  li.appendChild(time);
+  li.appendChild(deleteButton);
+
+  //console.log(li);
   return li;
 }
 

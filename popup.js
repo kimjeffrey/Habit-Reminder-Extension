@@ -1,16 +1,6 @@
-// const myHabits = document.querySelectorAll(".my-habit-list li");
 const myHabitList = document.querySelector('.my-habit-list');
 
-//   let li = createNewHabit(habitInput.value, timeInput.value)
-
-//   myHabitList.appendChild(li);
-
-//   console.log(`Habit ${habitInput.value} added with ${timeInput.value} minutes`);
-
-//   habitInput.value = "";
-//   timeInput.value = "";
-// })
-
+// Updates the remaining time on active timers
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.cmd === 'UPDATE_DISPLAY') {
     let time = document.querySelector(`.${request.habitName}`);
@@ -18,13 +8,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 })
 
+// Displays updated popup
 function restoreOptions() {
   chrome.storage.sync.get([
     'myHabits'
   ], function(result){
     if(result.myHabits){
       result.myHabits.forEach(habit => {
-        console.log(`habit name: ${habit.habitName}. time: ${habit.timeValue}`);
+        //console.log(`habit name: ${habit.habitName}. time: ${habit.timeValue}`);
         let li = createNewHabit(habit.habitName, habit.timeValue);
         myHabitList.appendChild(li);
       })
@@ -32,13 +23,17 @@ function restoreOptions() {
   })
 }
 
+// Creates the habit name, timer, and button and returns it in a li
 function createNewHabit(habitName, timeValue){
   let li = document.createElement("li");
   let input = document.createTextNode(habitName);
+
   let time = document.createElement("p");
   let habitClassName = habitName.replace(/\s+/g, '');
-  time.className = habitClassName;
   let timeInput = document.createTextNode(timeValue);
+  time.className = habitClassName;
+  time.appendChild(timeInput);
+
   let button = document.createElement('button');
 
   chrome.runtime.sendMessage({cmd: 'GET_TIMER_STATUS', 'habitName': habitName}, response => {
@@ -49,11 +44,6 @@ function createNewHabit(habitName, timeValue){
     }
   })
   
-  time.appendChild(timeInput);
-  li.appendChild(input);
-  li.appendChild(time);
-  li.appendChild(button);
-
   button.addEventListener('click', function() {
     if(button.innerText === "Start Timer" || button.innerText === "Restart Timer"){
       chrome.runtime.sendMessage({cmd: 'START_TIMER', 'habitName': habitName, 'habitClassName': habitClassName, 'timeValue': timeValue});
@@ -75,10 +65,16 @@ function createNewHabit(habitName, timeValue){
         button.innerText = "Start Timer";
     }
   });
-  console.log(li);
+
+  li.appendChild(input);
+  li.appendChild(time);
+  li.appendChild(button);
+
+  //console.log(li);
   return li;
 }
 
+// Opens options page when 'Create a New Habit' button is clicked
 document.querySelector('.go-to-options').addEventListener('click', function() {
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage();
@@ -87,6 +83,7 @@ document.querySelector('.go-to-options').addEventListener('click', function() {
   }
 });
 
+// Displays updated popup page whenever it is reopened
 document.addEventListener('DOMContentLoaded', function() {
   restoreOptions();
 })

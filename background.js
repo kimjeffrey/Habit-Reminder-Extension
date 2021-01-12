@@ -1,8 +1,8 @@
+// Holds the timer IDs in order to stop them when 'Stop' button pressed
 const myHabitTimers = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  //let time = document.querySelector(`.${request.habitName}`);
-
+  // To start timer for respective habit
   if (request.cmd === 'START_TIMER') {
     let remainingTime = request.timeValue * 60;
     let notificationPersist, notificationSoundCheckbox, loop;
@@ -29,8 +29,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         chrome.notifications.create(`${Date.now()}`, {
           title: request.habitName,
-          message: "Reminder time!",
-          iconUrl: 'icon.png',
+          message: "Reminder!",
+          iconUrl: 'icons/icon128.png',
           type: 'basic',
           requireInteraction: notificationPersist
         });
@@ -48,11 +48,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     }, 1000)
 
-  } else if (request.cmd === 'STOP_TIMER') {
+  } else if (request.cmd === 'STOP_TIMER') { // To stop respective habit timer
     let myCountdown = myHabitTimers[request.habitName];
     clearInterval(myCountdown);
     myHabitTimers[request.habitName] = "";
-  } else if (request.cmd === 'DELETE_HABIT') {
+  } else if (request.cmd === 'DELETE_HABIT') { // To Delete respective habit
     chrome.storage.sync.get([
       'myHabits'
     ], function(result){
@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       }
     })
-  } else if (request.cmd === 'GET_TIMER_STATUS') {
+  } else if (request.cmd === 'GET_TIMER_STATUS') { // To check if timer is active
     let myCountdown = myHabitTimers[request.habitName];
     if(myCountdown === ""){
       sendResponse("");
@@ -80,6 +80,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// Play notification sound
 function playSound() {
   chrome.storage.sync.get(['notification-sound'], function(result) {
     let soundName = result['notification-sound'];
@@ -88,6 +89,7 @@ function playSound() {
   })
 }
 
+// Display seconds to minutes:seconds
 function secondsToMinutes(seconds) {
   let minutes = Math.floor(seconds / 60);
   let remainder = seconds % 60;
@@ -100,6 +102,7 @@ function secondsToMinutes(seconds) {
   }
 }
 
+// To reset all timers when settings change
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.sync.get(['myHabits'], result => {
     if(result.myHabits){
