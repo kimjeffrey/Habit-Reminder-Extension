@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/options.css">
+  <script src="options.js" defer></script>
+  <title>Habit Reminder Options</title>
+</head>
+<body>
+  <h1>Reminder Options</h1>
+  <hr>
+  <label for="">
+    <input type="checkbox" class="notification-sound-checkbox">
+    Play notification sound at end of timer
+  </label>
+  <select name="" class="notification-sound">
+    <option value="arpeggio-467">Arpeggio</option>
+    <option value="coins-497">Coin</option>
+  </select>
+  <button class="test-notification-sound">Test</button>
+  <br>
+  <label for="">
+    <input type="checkbox" class="notification-persist">
+    Enable persistent notification until dismissed
+  </label>
+  <br>
+  <p class="warning">(Saving changes will cause any active timers to reset.)</p>
+  <div class="save-changes">
+    <p class="save-changes-status"></p>
+    <button class="save-changes-btn">Save Changes</button>
+  </div>
+
+  <h1>Create a new habit</h1>
+  <hr>
+  <form class="habit-form">
+    <label for="">
+      Habit name:
+      <input class="habit-input" type="text">
+    </label> 
+    <br>
+    <label for="">
+      Time interval:
+      <input class="time-input" type="number"> minutes
+    </label>
+    <br>
+    <p class="warning">(Creating/deleting/editing habits will cause any active timers to reset.)</p>
+    <div class="submit-habit">
+      <p class="submit-status"></p>
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <h2>My Habits</h2>
+  <div class="my-habit-labels">
+    <p>Loop</p>
+    <p>Habit Name</p>
+    <p>Time(minutes)</p>
+  </div>
+  <ul class="my-habit-list">
+
+  </ul>
+</body>
+</html>

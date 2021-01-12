@@ -1,0 +1,53 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 500px;
+  margin: auto;
+  line-height: 2;
+}
+
+h1 {
+  margin: 20px;
+  text-align: center;
+}
+
+hr {
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 3px 8px;
+}
+
+.save-changes, .submit-habit {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+li {
+  display: grid;
+  grid-template-columns: .5fr 1fr 1fr 1fr;
+  list-style: none;
+  margin: 20px;
+}
+
+li button {
+  justify-self: flex-start;
+}
+
+.my-habit-labels {
+  font-size: 1.2em;
+  text-decoration: underline;
+  display: grid;
+  grid-template-columns: .5fr 1fr 1fr 1fr;
+  margin: 20px;
+}
+
+.warning {
+  font-weight: bold;
+}

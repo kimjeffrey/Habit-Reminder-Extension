@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Habit Reminder",
+  "version": "1.0.0",
+  "description": "To help remind you of habits/tasks such as drinking water or stretching.",
+  "short_name": "Habit",
+  "permissions": ["notifications", "storage"],
+  "browser_action": {
+    "default_title": "Habit Reminder",
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "options_page": "options.html"
+ }
