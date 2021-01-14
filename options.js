@@ -147,7 +147,7 @@ function createNewHabit(habitName, timeValue, loopBool, id){
   deleteButton.innerText = 'Delete';
 
   deleteButton.addEventListener('click', function() {
-    chrome.runtime.sendMessage({cmd: 'DELETE_HABIT', 'habitName': habitName});
+    chrome.runtime.sendMessage({cmd: 'DELETE_HABIT', 'id': id});
   });
 
   li.appendChild(loopCheckbox);

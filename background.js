@@ -60,7 +60,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     ], function(result){
       if(result.myHabits){
         for(let i=0; i < result.myHabits.length; i++){
-          if(result.myHabits[i].habitName === request.habitName){
+          if(result.myHabits[i].id === request.id){
             let newMyHabits = [...result.myHabits];
             newMyHabits.splice(i, 1);
             chrome.storage.sync.set({'myHabits': newMyHabits}, () => {
