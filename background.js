@@ -1,5 +1,6 @@
 // Holds the timer IDs in order to stop them when 'Stop' button pressed
 const myHabitTimers = {};
+const myHabitTimeRemaining = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // To start timer for respective habit
@@ -12,17 +13,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       notificationSoundCheckbox = result['notification-sound-checkbox'];
       
       for(let i=0; i < result.myHabits.length; i++){
-        if(result.myHabits[i].habitName === request.habitName){
+        if(result.myHabits[i].id === request.id){
           loop = result.myHabits[i].loop;
           break;
         }
       }
     })
 
-    myHabitTimers[request.habitName] = setInterval(() => {   
+    myHabitTimers[request.id] = setInterval(() => {   
       remainingTime--;
       remainingTimeInMinutes = secondsToMinutes(remainingTime);
-      chrome.runtime.sendMessage({cmd: 'UPDATE_DISPLAY', 'remainingTime': remainingTimeInMinutes, 'habitName': request.habitClassName});
+      chrome.runtime.sendMessage({cmd: 'UPDATE_DISPLAY', 'remainingTime': remainingTimeInMinutes, 'id': request.id});
+      myHabitTimeRemaining[request.id] = remainingTimeInMinutes;
     
       if(remainingTime === 0){
         console.log("Time's up!");
@@ -42,16 +44,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if(loop){
           remainingTime = request.timeValue * 60;
         } else{
-          clearInterval(myHabitTimers[request.habitName]);
-          myHabitTimers[request.habitName] = "";
+          clearInterval(myHabitTimers[request.id]);
+          myHabitTimers[request.id] = "";
         }        
       }
     }, 1000)
 
   } else if (request.cmd === 'STOP_TIMER') { // To stop respective habit timer
-    let myCountdown = myHabitTimers[request.habitName];
+    let myCountdown = myHabitTimers[request.id];
     clearInterval(myCountdown);
-    myHabitTimers[request.habitName] = "";
+    myHabitTimers[request.id] = "";
   } else if (request.cmd === 'DELETE_HABIT') { // To Delete respective habit
     chrome.storage.sync.get([
       'myHabits'
@@ -70,11 +72,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     })
   } else if (request.cmd === 'GET_TIMER_STATUS') { // To check if timer is active
-    let myCountdown = myHabitTimers[request.habitName];
+    let myCountdown = myHabitTimers[request.id];
     if(myCountdown === ""){
       sendResponse("");
     } else{
-      sendResponse("active")
+      sendResponse(myHabitTimeRemaining[request.id])
     }
     return true;
   }
@@ -107,8 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.sync.get(['myHabits'], result => {
     if(result.myHabits){
       for(let i=0; i < result.myHabits.length; i++){
-        let habitName = result.myHabits[i].habitName;
-        myHabitTimers[habitName] = "";
+        let id = result.myHabits[i].id;
+        myHabitTimers[id] = "";
       }
     }
   })

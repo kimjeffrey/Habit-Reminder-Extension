@@ -3,7 +3,7 @@ const myHabitList = document.querySelector('.my-habit-list');
 // Updates the remaining time on active timers
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.cmd === 'UPDATE_DISPLAY') {
-    let time = document.querySelector(`.${request.habitName}`);
+    let time = document.querySelector(`#${request.id}`);
     time.innerText = request.remainingTime;
   }
 })
@@ -16,7 +16,7 @@ function restoreOptions() {
     if(result.myHabits){
       result.myHabits.forEach(habit => {
         //console.log(`habit name: ${habit.habitName}. time: ${habit.timeValue}`);
-        let li = createNewHabit(habit.habitName, habit.timeValue);
+        let li = createNewHabit(habit.habitName, habit.timeValue, habit.id);
         myHabitList.appendChild(li);
       })
     }
@@ -24,31 +24,33 @@ function restoreOptions() {
 }
 
 // Creates the habit name, timer, and button and returns it in a li
-function createNewHabit(habitName, timeValue){
+function createNewHabit(habitName, timeValue, id){
   let li = document.createElement("li");
   let input = document.createTextNode(habitName);
 
   let time = document.createElement("p");
-  let habitClassName = habitName.replace(/\s+/g, '');
   let timeInput = document.createTextNode(timeValue);
-  time.className = habitClassName;
-  time.appendChild(timeInput);
+  time.id = id;
 
   let button = document.createElement('button');
 
-  chrome.runtime.sendMessage({cmd: 'GET_TIMER_STATUS', 'habitName': habitName}, response => {
+  chrome.runtime.sendMessage({cmd: 'GET_TIMER_STATUS', 'id': id}, response => {
     if(response === ""){
       button.appendChild(document.createTextNode("Start Timer"))
     } else {
-      button.appendChild(document.createTextNode("Stop Timer"))
+      button.appendChild(document.createTextNode("Stop Timer"));
+      console.log(response);
+      timeInput = document.createTextNode(response);
     }
+    time.appendChild(timeInput);
   })
+  
   
   button.addEventListener('click', function() {
     if(button.innerText === "Start Timer" || button.innerText === "Restart Timer"){
-      chrome.runtime.sendMessage({cmd: 'START_TIMER', 'habitName': habitName, 'habitClassName': habitClassName, 'timeValue': timeValue});
+      chrome.runtime.sendMessage({cmd: 'START_TIMER', 'habitName': habitName, 'id': id, 'timeValue': timeValue});
     } else if(button.innerText === "Stop Timer"){
-      chrome.runtime.sendMessage({cmd: 'STOP_TIMER', 'habitName': habitName});
+      chrome.runtime.sendMessage({cmd: 'STOP_TIMER', 'id': id});
     }
     
     switch(button.innerText){

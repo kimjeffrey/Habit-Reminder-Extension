@@ -34,13 +34,23 @@ document.querySelector('.habit-form').addEventListener('submit', event => {
   let timeInput = document.querySelector('.time-input');
   let status = document.querySelector('.submit-status');
 
-  if(habitInput.value === "" || timeInput === ""){
+  if(habitInput.value === "" || timeInput.value === ""){
+    status.innerText = "Please input a value for both fields.";
+      setTimeout(() => {
+        status.innerText = "";
+      }, 2000)
     return;
-  }
+  } else if(timeInput.value <= 0){
+    status.innerText = "Please input a value greater than 0.";
+      setTimeout(() => {
+        status.innerText = "";
+      }, 2000)
+    return;
+  } 
 
   //console.log(habitInput.value, timeInput.value);
 
-  let newHabit = {'habitName': habitInput.value, 'timeValue': timeInput.value, 'loop': false};
+  let newHabit = {'habitName': habitInput.value, 'timeValue': timeInput.value, 'loop': false, 'id': `id-${Date.now()}`};
 
   chrome.storage.sync.get(['myHabits'], function(result){
     let newHabitArray = [];
@@ -82,11 +92,11 @@ function restoreOptions() {
     'notification-sound',
     'notification-sound-checkbox'
   ], function(result){
-    console.log(result.myHabits);
+    //console.log(result.myHabits);
     if(result.myHabits){
       result.myHabits.forEach(habit => {
-        console.log(`habit name: ${habit.habitName}. time: ${habit.timeValue}. loop: ${habit.loop}`);
-        let li = createNewHabit(habit.habitName, habit.timeValue, habit.loop);
+        //console.log(`habit name: ${habit.habitName}. time: ${habit.timeValue}. loop: ${habit.loop}`);
+        let li = createNewHabit(habit.habitName, habit.timeValue, habit.loop, habit.id);
         myHabitList.appendChild(li);
       })
     }
@@ -98,19 +108,16 @@ function restoreOptions() {
 }
 
 // Creates the habit and returns it in a li
-function createNewHabit(habitName, timeValue, loopBool){
+function createNewHabit(habitName, timeValue, loopBool, id){
   let li = document.createElement("li");
   let input = document.createTextNode(habitName);
 
   let time = document.createElement("p");
-  let habitClassName = habitName.replace(/\s+/g, '');
   let timeInput = document.createTextNode(timeValue);
-  time.className = habitClassName;
   time.appendChild(timeInput);
 
   let loopCheckbox = document.createElement("input");
   loopCheckbox.type = 'checkbox';
-  loopCheckbox.className = `${habitClassName}-loop`
   loopCheckbox.checked = loopBool;
 
   loopCheckbox.addEventListener('change', function() {
@@ -120,9 +127,9 @@ function createNewHabit(habitName, timeValue, loopBool){
     ], function(result){
       if(result.myHabits){
         for(let i=0; i < result.myHabits.length; i++){
-          console.log(result.myHabits[i].habitName);
-          console.log(habitName);
-          if(result.myHabits[i].habitName === habitName){
+          //console.log(result.myHabits[i].habitName);
+          //console.log(habitName);
+          if(result.myHabits[i].id === id){
             let newMyHabits = [...result.myHabits];
             newMyHabits[i].loop = checked;
             chrome.storage.sync.set({'myHabits': newMyHabits}, () => {
@@ -137,11 +144,10 @@ function createNewHabit(habitName, timeValue, loopBool){
   })
 
   let deleteButton = document.createElement("button");
-  deleteButton.className = `${habitClassName}-delete`;
   deleteButton.innerText = 'Delete';
 
   deleteButton.addEventListener('click', function() {
-    chrome.runtime.sendMessage({cmd: 'DELETE_HABIT', 'habitName': habitName, 'habitClassName': habitClassName});
+    chrome.runtime.sendMessage({cmd: 'DELETE_HABIT', 'habitName': habitName});
   });
 
   li.appendChild(loopCheckbox);
