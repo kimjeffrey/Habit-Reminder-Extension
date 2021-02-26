@@ -23,7 +23,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
 
     myHabitTimers[request.id] = setInterval(() => {   
-      console.log(sleepTimerBool);
       if(!sleepTimerBool){
         remainingTime--;
         if(sleepTimerBool !== currentSleepTimerBool) {
@@ -36,7 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       myHabitTimeRemaining[request.id] = remainingTimeInMinutes;
     
       if(remainingTime === 0){
-        console.log("Time's up!");
+        //console.log("Time's up!");
 
         chrome.notifications.create(`${Date.now()}`, {
           title: request.habitName,
@@ -104,10 +103,13 @@ function checkSleepTimerStatus(sleepStart, sleepEnd) {
   let hour = currentDate.getHours();
   let minutes = currentDate.getMinutes();
   let currentTime = `${hour}:${minutes}`;
-  if(minutes < 10) {
+  if(hour < 10 && minutes < 10) {
+    currentTime = `0${hour}:0${minutes}`;
+  } else if(hour < 10) {
+    currentTime = `0${hour}:${minutes}`;
+  } else if(minutes < 10) {
     currentTime = `${hour}:0${minutes}`;
-  }
-  console.log(currentTime);
+  } 
   if(sleepStart < sleepEnd) {
     if(currentTime >= sleepStart && currentTime < sleepEnd) {
       sleepTimerBool = true;
@@ -140,7 +142,7 @@ function playSound() {
 function secondsToMinutes(seconds) {
   let minutes = Math.floor(seconds / 60);
   let remainder = seconds % 60;
-  console.log(`${minutes}:${remainder}`);
+  //console.log(`${minutes}:${remainder}`);
 
   if(remainder >= 10){
     return `${minutes}:${remainder}`
