@@ -1,12 +1,14 @@
 // Holds the timer IDs in order to stop them when 'Stop' button pressed
 const myHabitTimers = {};
 const myHabitTimeRemaining = {};
+let sleepTimerBool = false;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // To start timer for respective habit
   if (request.cmd === 'START_TIMER') {
     let remainingTime = request.timeValue * 60;
     let notificationPersist, notificationSoundCheckbox, loop;
+    let currentSleepTimerBool = sleepTimerBool;
 
     chrome.storage.sync.get(['myHabits', 'notification-persist', 'notification-sound-checkbox'], result => {
       notificationPersist = result['notification-persist'];
@@ -21,7 +23,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     })
 
     myHabitTimers[request.id] = setInterval(() => {   
-      remainingTime--;
+      console.log(sleepTimerBool);
+      if(!sleepTimerBool){
+        remainingTime--;
+        if(sleepTimerBool !== currentSleepTimerBool) {
+          remainingTime = request.timeValue * 60;
+        }
+      }
+      currentSleepTimerBool = sleepTimerBool;
       remainingTimeInMinutes = secondsToMinutes(remainingTime);
       chrome.runtime.sendMessage({cmd: 'UPDATE_DISPLAY', 'remainingTime': remainingTimeInMinutes, 'id': request.id});
       myHabitTimeRemaining[request.id] = remainingTimeInMinutes;
@@ -82,6 +91,42 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// Check if current time falls within sleep timer
+function createSleepTimer(sleepStart, sleepEnd) {
+  checkSleepTimerStatus(sleepStart, sleepEnd);
+  setInterval(() => {
+    checkSleepTimerStatus(sleepStart, sleepEnd)
+  }, 60000);
+}
+
+function checkSleepTimerStatus(sleepStart, sleepEnd) {
+  let currentDate = new Date();
+  let hour = currentDate.getHours();
+  let minutes = currentDate.getMinutes();
+  let currentTime = `${hour}:${minutes}`;
+  if(minutes < 10) {
+    currentTime = `${hour}:0${minutes}`;
+  }
+  console.log(currentTime);
+  if(sleepStart < sleepEnd) {
+    if(currentTime >= sleepStart && currentTime < sleepEnd) {
+      sleepTimerBool = true;
+    } else {
+      sleepTimerBool = false;
+    }
+  } else if(sleepStart > sleepEnd) {
+    if(currentTime < sleepStart && currentTime > sleepEnd) {
+      sleepTimerBool = false;
+    }
+    else if(currentTime < sleepStart && currentTime < sleepEnd) {
+      sleepTimerBool = true;
+    }
+    else if(currentTime >= sleepStart && currentTime > sleepEnd) {
+      sleepTimerBool = true;
+    }
+  }
+}
+
 // Play notification sound
 function playSound() {
   chrome.storage.sync.get(['notification-sound'], function(result) {
@@ -106,12 +151,15 @@ function secondsToMinutes(seconds) {
 
 // To reset all timers when settings change
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.sync.get(['myHabits'], result => {
+  chrome.storage.sync.get(['myHabits', 'sleep-timer-checkbox', 'sleep-timer-start', 'sleep-timer-end'], result => {
     if(result.myHabits){
       for(let i=0; i < result.myHabits.length; i++){
         let id = result.myHabits[i].id;
         myHabitTimers[id] = "";
       }
+    }
+    if(result['sleep-timer-checkbox']) {
+      createSleepTimer(result['sleep-timer-start'], result['sleep-timer-end']);
     }
   })
 })
